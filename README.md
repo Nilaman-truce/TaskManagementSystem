@@ -2,7 +2,7 @@ o	Explain setup instructions, dependencies, and key design decisions.
 
 Clone or extract the file use master branch
 
-Dependencies Install Dapper, Dapper.Contrib, Microsoft.Data.SqlCline(5.2.2) please do not install the 6.0.1 version, QuestPDF, ClosedXML.
+Dependencies Install Dapper, Dapper.Contrib, Microsoft.Data.SqlClient(5.2.2) please do not install the 6.0.1 version, QuestPDF, ClosedXML.
 
 I used .NET 7.0, ASP.NET CORE MVC, Dapper, SQL SERVER, JavaScript(jQuery), Bootstrap, HTML/CSS. Used dapper to connect the database and used Repository with raw SQL query and linked them with controller for CRUD operation. 
 Created three Tables Tasks, Status and Priority. Status and Priority table are created inorder to show the dropdown and they are linked with Tasks table by their specific id. Wasn't able to use most of the jQuery 
