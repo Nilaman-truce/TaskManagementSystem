@@ -1,0 +1,101 @@
+﻿@model TaskManagementSystem.Models.TasksModel
+
+<h3>Edit Task</h3>
+
+<input type="hidden" id="TaskId" value="@Model.Id" />
+<form id="formCreateTask">
+
+    <div class="row pad-l-15 pad-r-15">
+        <div class="col-md-12 ">
+            <div class="form-group mb-3 ">
+                <label for="Title">Title<span class="text-danger">*</span></label>
+                @Html.TextBoxFor(m => m.Title, new { @class = "form-control form-control-sm" })
+                <span style="color: red;" id="errorMessageTitle">Required</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row pad-l-15 pad-r-15">
+        <div class="col-md-12">
+            <div class="form-group mb-3">
+                <label for="Description">Description</label>
+                @Html.TextAreaFor(m => m.Description, new { @class = "form-control form-control-sm" })
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="row pad-l-15 pad-r-15">
+        <div class="col-md-12">
+            <div class="form-group mb-3">
+                <label for="DueDate">Due Date</label>
+                <input type="date" id="dueDateInput" value="@Model.DueDate?.ToString("yyyy-MM-dd")" name="date"/>
+            </div>
+        </div>
+    </div>
+
+    @*
+    <div class="row pad-l-15 pad-r-15">
+    <div class="col-md-12">
+    <div class="form-group mb-3">
+    <label for="DueDate">Due Date</label>
+    <input type="text" id="dueDatepickerId" name="dueDatePicker" />
+    </div>
+    </div>
+    </div>*@
+
+    <div class="row pad-l-15 pad-r-15">
+        <div class="col-md-6">
+            <div class="form-group mb-3">
+                <label for="Status">Status</label>
+                <select id="statusId" name="Status" class="form-control">
+                    <option value="">Select Status</option>
+                    @foreach (var status in ViewBag.Status as IEnumerable<StatusModel>)
+                    {
+                        <option id="statusId" value="@status.Id">@status.Title</option>
+                    }
+                </select>
+                <span style="color: red;" id="errorMessageStatus">Required</span>
+            </div>
+            
+        </div>
+        <div class="col-md-6">
+            <div class="form-group mb-3">
+                <label for="Priority">Priority</label>
+                <select id="priorityId" name="Priority" class="form-control">
+                    <option value="">Select Priority</option>
+                    @foreach (var priority in ViewBag.Priority as IEnumerable<PriorityModel>)
+                    {
+                        <option id="priorityId" value="@priority.Id">@priority.Title</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        var $j = jQuery.noConflict();
+
+        $("#errorMessageTitle").hide();
+        $("#errorMessageStatus").hide();
+        $("#statusId").val("@Model.StatusId").trigger("change");
+        $("#priorityId").val("@Model.PriorityId").trigger("change");
+        //var selectedDueDate = $(this).find(":selected").data("@Model.DueDate"); 
+        //$("#dueDateInput").val(selectedDueDate);
+        //$("#dueDateInput").val("@Model.DueDate").trigger("change");
+        //$("#dueDatepickerId").datepicker({
+        //    dateFormat: "yy-mm-dd",
+        //    changeMonth: true,
+        //    changeYear: true,
+        //    yearRange: "1900:2100"
+        //});
+    });
+</script>

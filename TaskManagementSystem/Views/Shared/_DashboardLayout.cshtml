@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+    <style>
+        /* Custom styles for Dashboard */
+        body {
+            padding-top: 20px;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 250px;
+            background-color: #343a40;
+            color: white;
+            padding-top: 20px;
+        }
+
+            .sidebar a {
+                color: white;
+                text-decoration: none;
+                padding: 10px;
+                display: block;
+            }
+
+                .sidebar a:hover {
+                    background-color: #575757;
+                }
+
+        .content {
+            margin-left: 270px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h3 class="text-center">Dashboard</h3>
+        @*<a href="/ExchangeRate/Index?loginId=@GlobalVariables.LoginId" "><i class="fas fa-tachometer-alt"></i> Dashboard</a>*@
+        <a href="/Task/Index"><i class="fas fa-tachometer-alt"></i> Task</a>
+        <a href="/Report/Index"><i class="fas fa-chart-line"></i> Report</a>
+        
+        @*
+        <a href="/MoneyTransfer/Index"><i class="fas fa-chart-line"></i> Money Transfer</a>
+        <a href="/Home/Index"><i class="fas fa-sign-out-alt"></i> Logout</a>*@
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">Dashboard</a>
+            @*  <div class="ml-auto">
+            <button class="btn btn-outline-secondary">Notifications</button>
+            </div>*@
+        </nav>
+
+        <div class="container mt-4">
+            @RenderBody() <!-- This is where individual page content will go -->
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

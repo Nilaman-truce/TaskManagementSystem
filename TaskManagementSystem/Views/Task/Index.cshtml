@@ -1,0 +1,361 @@
+﻿@{
+    Layout = "_DashboardLayout";
+  
+    ViewData["Title"] = "Task";
+}
+@model IEnumerable<TaskManagementSystem.Models.TasksModel>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <h3>Tasks</h3>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+    <div class="container mt-4">
+
+        <div class="row mb-3">
+            <div class="col-md-8">
+                <input type="text" name="searchTerm" placeholder="Search tasks..."
+                       value="@ViewBag.CurrentSearch" id="searchTextId" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                
+            </div>
+            <div class="col-md-2 d-flex justify-content-end">
+                <button id="btnAdd" class="btn btn-primary btn-block">Add Task</button>
+            </div>
+        </div>
+
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th hidden>Id</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var task in Model)
+                {
+                    <tr>
+                        <td hidden id="taskId">@task.Id</td>
+                        <td>@task.Title</td>
+                        <td>@task.Description</td>
+                        <td>@(task.DueDate.HasValue ? task.DueDate.Value.ToString("MM/dd/yyyy") : "")</td>
+                       <td> 
+                            @if (task.StatusTitle == "Pending")
+                            {
+                                <span style="color: red;">@task.StatusTitle</span>
+                            }
+                            else if (task.StatusTitle == "In Progress")
+                            {
+                                <span style="color: blue;">@task.StatusTitle</span>
+                            }
+                            else
+                            {
+                                <span style="color: green;">@task.StatusTitle</span>
+                            }
+                        </td>
+                        <td>
+                            @if (task.PriorityTitle == "High")
+                            {
+                                <span style="color: red;">@task.PriorityTitle</span>
+                            }
+                            else if (task.PriorityTitle == "Medium")
+                            {
+                                <span style="color: blue;">@task.PriorityTitle</span>
+                            }
+                            else
+                            {
+                                <span style="color: green;">@task.PriorityTitle</span>
+                            }
+                            
+                        <td>
+                            <button id="editTask" data-id="@task.Id" class="fas fa-edit"></button>
+                            <button id="deleteTask" data-id="@task.Id" class="fas fa-trash"></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="mt-3 text-end">
+            <a asp-action="Index"
+               asp-route-page="@(ViewBag.CurrentPage - 1)"
+               asp-route-searchTerm="@ViewBag.CurrentSearch"
+               class="btn btn-primary @(ViewBag.CurrentPage <= 1 ? "disabled" : "")">
+                Previous
+            </a>
+
+            <span>Page @ViewBag.CurrentPage</span>
+
+            <a asp-action="Index"
+               asp-route-page="@(ViewBag.CurrentPage + 1)"
+               asp-route-searchTerm="@ViewBag.CurrentSearch"
+               class="btn btn-primary">
+                Next
+            </a>
+        </div>
+
+    </div>
+
+
+</body>
+</html>
+<div class="modal fade" id="taskModal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="false">
+    <div class="modal-dialog" style="width:900px">
+        <div class="modal-content">
+            <div class="modal-header">
+                @*<div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">*@
+                <h4 class="modal-title" id="ModalLabel"></h4>
+            </div>
+            <div class="modal-body" id="modalContent"></div>
+            <div class="modal-footer">
+                <button type="button" id="btnClose" class="btn btn-danger btn-sm" data-bs-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                <button type="button" id="btnSave" class="btn btn-success btn-sm"><i class="fa fa-save"></i> Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        debugger;
+
+
+        $("#searchTextId").on('keyup', function () {
+            debugger;
+            var searchTextVal = $("#searchTextId").val();
+            window.location.href = "/Task/Index?searchTerm=" + encodeURIComponent(searchTextVal) + "&page=1";
+        });
+        $("#btnAdd").on('click',function(){
+            $.ajax({
+                type: "GET", 
+                url: "/Task/CreateTask",
+                success: function (response) {
+                    debugger;
+                    $("#modalContent").html(response);
+                    $("#taskModal").modal("show");
+                },
+                error: function (response) {
+                    debugger;
+                    alert("Error loading CreateTask view.");
+                }
+            });
+        });
+
+        
+        $("#taskModal #btnSave").on('click', function () {
+            debugger;
+            var isValid = 0;
+            var taskId = $('#TaskId').val();
+            var titleVal = $('#Title').val();
+            var statusVal = $('#statusId').val();
+            var dueDateVal = $('#dueDateInput').val();
+            if(dueDateVal == ""){
+                dueDateVal = null;
+            }
+
+            if (titleVal == "" || statusVal == "") {
+                if (titleVal == "") {
+                    $("#errorMessageTitle").show();
+                }
+                if (statusVal == "") {
+                    $("#errorMessageStatus").show();
+                }
+            }
+
+            if(titleVal != "" && statusVal != ""){
+                isValid = 1;
+            }
+
+            if (typeof taskId === "undefined" && isValid == 1) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/Task/SaveTask',
+                    datatype: 'json',
+                    data: JSON.stringify({
+                        Title: $('#Title').val(),
+                        Description: $('#Description').val(),
+                        DueDate: dueDateVal,
+                        StatusId: $('#statusId').val(),
+                        PriorityId: $('#priorityId').val(),
+
+                    }),
+                    contentType: "application/json;charset=utf-8",
+                    success: function (data) {
+                        $('#taskModal #btnSave').removeAttr('disabled');
+                        if (data.IsSuccess) {
+                            $('#taskModal').modal('hide');
+                            selectedId = data.ReturnInteger;
+                            window.location.href = "/Task/Index";
+
+                            //toastr.success(data.ReturnMessage);
+                        } else {
+                          @*  $('#taskModal').modal('hide');*@
+
+                            window.location.href = "/Task/Index";
+
+                            //toastr.error(data.ReturnMessage);
+                        }
+                        mainScript.loader.hide();
+                    },
+                    error: function (res) {
+                        $('#taskModal #btnSave').removeAttr('disabled');
+                        //toastr.error(res.responseText);
+                        mainScript.loader.hide();
+                    }
+                });
+            }
+
+            if (typeof taskId !== "undefined" && isValid == 1) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/Task/Edit',
+                    datatype: 'json',
+                    data: JSON.stringify({
+                        Id: $('#TaskId').val(),
+                        Title: $('#Title').val(),
+                        Description: $('#Description').val(),
+                         DueDate: dueDateVal,
+                        StatusId: $('#statusId').val(),
+                        PriorityId: $('#priorityId').val(),
+
+                    }),
+                    contentType: "application/json;charset=utf-8",
+                    success: function (data) {
+                        $('#taskModal #btnSave').removeAttr('disabled');
+                        if (data.IsSuccess) {
+                            $('#taskModal').modal('hide');
+                            selectedId = data.ReturnInteger;
+                            window.location.href = "/Task/Index";
+
+                            //toastr.success(data.ReturnMessage);
+                        } else {
+                            $('#taskModal').modal('hide');
+                            window.location.href = "/Task/Index";
+
+                            //toastr.error(data.ReturnMessage);
+                        }
+                        mainScript.loader.hide();
+                    },
+                    error: function (res) {
+                        $('#taskModal #btnSave').removeAttr('disabled');
+                        toastr.error(res.responseText);
+                        mainScript.loader.hide();
+                    }
+                });
+            }
+        });
+
+        $("#btnClose").on('click', function () {
+            $('#taskModal').modal('hide');  // This hides the modal
+        });
+
+        function GetTaskModel() {
+            debugger;
+
+            var model = {
+                Title: $('#Title').val(),
+                Description: $('#Description').val()
+            };
+            return model;
+
+        }
+
+        //$("#TasksModal").hide();
+    });
+
+    $(document).on("click", "#deleteTask", function () {
+        debugger;
+
+        var taskId = $(this).data('id');
+        var isConfirmed = confirm("Are you sure you want to delete this task?");
+
+        if (isConfirmed) {
+        $.ajax({
+            type: "POST",
+            url: "/Task/Delete/" + taskId,
+            dataType: "html",
+            success: function (response) {
+                debugger;
+                window.location.href = "/Task/Index";
+            },
+            error: function (xhr, status, error) {
+                console.error("Error Deleting", error);
+                //alert("Error Deleting view.");
+            }
+        });
+        }
+
+      @*  //Swal.fire({
+        //    title: 'Delete',
+        //    icon: "warning",
+        //    showCancelButton: true,
+        //    buttonsStyling: false,
+        //    confirmButtonText: "Yes",
+        //    cancelButtonText: "Cancel",
+        //    customClass: {
+        //        confirmButton: "btn fw-bold btn-danger",
+        //        cancelButton: "btn fw-bold btn-active-light-primary"
+        //    }
+        //}).then(function (result) {
+        //    if (result.value) {
+        //        $.ajax({
+        //            type: 'POST',
+        //            url: "/Task/Delete/" + taskId,
+        //            dataType: "html",
+
+        //            contentType: "application/json;charset=utf-8",
+        //            success: function (data) {
+        //                if (data.toLowerCase().indexOf("success") > -1) {
+        //                    window.location.href = "/Task/Index";
+        //                } else {
+        //                    console.error("Error Deleting", error);
+        //                    alert("Error Deleting view.");
+        //                }
+        //            },
+        //            error: function (res) {
+        //                console.error(res.responseText);
+        //            }
+        //        });
+
+        //    }
+        //});*@
+
+    });
+
+
+
+
+    $(document).on("click", "#editTask", function () {
+        debugger;
+        var taskId = $(this).data('id');
+        $.ajax({
+            type: "GET",
+            url: "/Task/EditTask/" + taskId,
+            dataType: "html",
+            success: function (response) {
+                debugger;
+                $("#modalContent").html(response);
+                $("#taskModal").modal("show");
+            },
+            error: function (xhr, status, error) {
+                console.error("Error loading EditTask view:", error);
+                alert("Error loading EditTask view.");
+            }
+        });
+    });
+ </script>
